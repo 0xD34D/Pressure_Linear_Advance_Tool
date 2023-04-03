@@ -1,19 +1,15 @@
-# Pressure Advance / Linear Advance Calibration Tool
+# Pressure Advance / Linear Advance Calibration Tool for Belt Printers
 
 ## URL
 
-- [http://ellis3dp.com/Pressure_Linear_Advance_Tool/](http://ellis3dp.com/Pressure_Linear_Advance_Tool/)
+- [https://0xd34d.github.io/Pressure_Linear_Advance_Tool/](https://0xd34d.github.io/Pressure_Linear_Advance_Tool/)
 
 ## Documentation and Instructions
-
-- [https://ellis3dp.com/Print-Tuning-Guide/articles/pressure_linear_advance/introduction.html](https://ellis3dp.com/Print-Tuning-Guide/articles/pressure_linear_advance/introduction.html)
-
-## Old "Lines" Version (Deprecated!)
 
 - [http://ellis3dp.com/Pressure_Linear_Advance_Tool/lines_method_deprecated/](http://ellis3dp.com/Pressure_Linear_Advance_Tool/lines_method_deprecated/)
 
 ---
 
-### Original Marlin calibration tool [by Sineos](https://github.com/Sineos/k-factorjs). Heavily modified/rewritten by Andrew Ellis.
+### Original Pressure Advance / Linear Advance Calibration Tool [by Andrew Ellis](https://github.com/AndrewEllis93). Slightly modified/rewritten by Clark Scheff.
 
-- [Original Version](http://marlinfw.org/tools/lin_advance/k-factor.html)
+- [Original Version](https://github.com/AndrewEllis93/Pressure_Linear_Advance_Tool)
