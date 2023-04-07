@@ -55,6 +55,15 @@
               <td rowspan="40" class="txtareatd"><textarea name="textarea" id="gcodetextarea"></textarea></td>
             </tr>
             <tr>
+              <td><label for="GCODE_FLAVOR">GCode Flavor</label></td>
+              <td><select name="GCODE_FLAVOR" id="GCODE_FLAVOR">
+                  <option value="marlin">Marlin</option>
+                  <option value="klipper">Klipper</option>
+                </select></td>
+              <td>Select your GCode flavor.  Selecting Marlin will use <em>M900</em> to change linear advance values while
+              selecting Klipper will use <em>SET_PRESSURE_ADVANCE</em> </td>
+            </tr>
+            <tr>
               <td><label for="PRINTER">Printer Name</label></td>
               <td><input name="PRINTER" id="PRINTER" value="printer name" /></td>
               <td>Optional. Puts printer name in a comment in the g-code</td>

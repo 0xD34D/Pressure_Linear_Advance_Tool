@@ -20,7 +20,7 @@
 // Settings version of localStorage
 // Increase if default settings are changed / amended
 
-const SETTINGS_VERSION = '1.1';
+const SETTINGS_VERSION = '1.2';
 const PA_round = -4; // Was previously -3
 const Y_round = -3;
 const XZ_round = -4;
@@ -53,6 +53,7 @@ function genGcode() {
       EXTRUDER_NAME = $('#EXTRUDER_NAME').val(),
       FAN_SPEED = parseFloat($('#FAN_SPEED').val()),
       EXT_MULT = parseFloat($('#EXTRUSION_MULT').val()),
+      GCODE_FLAVOR = $('#GCODE_FLAVOR').val(),
       PATTERN_TYPE = $('#TYPE_PATTERN').val(),
       K_START = parseFloat($('#K_START').val()),
       K_END = parseFloat($('#K_END').val()),
@@ -115,7 +116,8 @@ function genGcode() {
     'retractSpeed' : SPEED_RETRACT,
     'unretractSpeed' : SPEED_UNRETRACT,
     'fwRetract' : USE_FWR,
-    'extruderName' : EXTRUDER_NAME
+    'extruderName' : EXTRUDER_NAME,
+    'gcodeFlavor' : GCODE_FLAVOR
   };
 
   var patSettings = {
@@ -272,7 +274,7 @@ function genGcode() {
   k_script += ';\n' +
               '; Mark the test area for reference\n' +
               'M117 K0\n' +
-              'SET_PRESSURE_ADVANCE ADVANCE=0 EXTRUDER=' + EXTRUDER_NAME + ' ; Set Pressure Advance 0\n' +
+              setPressureAdvance(0, EXTRUDER_NAME, GCODE_FLAVOR) +
               moveTo(refStartX1, refStartZ, basicSettings) +
               doEfeed('+', basicSettings, (USE_FWR ? 'FWR' : 'STD')) +
               createLine(refStartX1, refStartZ + 20, 20, basicSettings) +
@@ -418,6 +420,18 @@ function createLine(coordX, coordZ, length, basicSettings, optional) {
   return gcode;
 }
 
+function setPressureAdvance(k, extruderName, gcodeFlavor) {
+  var gcode = '';
+  if (gcodeFlavor == 'klipper') {
+    gcode += 'SET_PRESSURE_ADVANCE ADVANCE=' + k + ' EXTRUDER=' + extruderName;
+  } else {
+    gcode += 'M900 K' + k;
+  }
+
+  gcode += ' ; Set Pressure Advance ' + k + '\n';
+  return gcode;
+}
+
 // move print head to coordinates
 function moveTo(coordX, coordZ, basicSettings) {
   var gcode = '';
@@ -461,7 +475,7 @@ function createAltPattern(startX, startZ, basicSettings, patSettings) {
 
   for (var i = patSettings['kStart']; i <= patSettings['kEnd']; i += patSettings['kStep']) {
     if (k % 2 === 0) {
-      gcode += 'SET_PRESSURE_ADVANCE ADVANCE=' + Math.round10(i, PA_round) + ' EXTRUDER=' + basicSettings['extruderName'] + ' ; set Pressure Advance\n' +
+      gcode += setPressureAdvance(Math.round10(i, PA_round), basicSettings['extruderName'], basicSettings['gcodeFlavor']) +
                'M117 K' + Math.round10(i, PA_round) + ' ; \n' +
                createLine(startX + patSettings['lengthSlow'], startZ + j, patSettings['lengthSlow'], basicSettings, {'speed': basicSettings['slow']}) +
                createLine(startX + patSettings['lengthSlow'] + patSettings['lengthFast'], startZ + j, patSettings['lengthFast'], basicSettings, {'speed': basicSettings['fast']}) +
@@ -473,7 +487,7 @@ function createAltPattern(startX, startZ, basicSettings, patSettings) {
       j += patSettings['lineSpacing'];
       k += 1;
     } else if (k % 2 !== 0) {
-      gcode += 'SET_PRESSURE_ADVANCE ADVANCE=' + Math.round10(i, PA_round) + ' EXTRUDER=' + basicSettings['extruderName'] + ' ; set Pressure Advance\n' +
+      gcode += setPressureAdvance(Math.round10(i, PA_round), basicSettings['extruderName'], basicSettings['gcodeFlavor']) +
                'M117 K' + Math.round10(i, PA_round) + ' ; \n' +
                createLine(startX + patSettings['lengthSlow'] + patSettings['lengthFast'], startZ + j, patSettings['lengthSlow'], basicSettings, {'speed': basicSettings['slow']}) +
                createLine(startX + patSettings['lengthSlow'], startZ + j, patSettings['lengthFast'], basicSettings, {'speed': basicSettings['fast']}) +
@@ -496,7 +510,7 @@ function createStdPattern(startX, startZ, basicSettings, patSettings) {
       gcode = '';
 
   for (var i = patSettings['kStart']; i <= patSettings['kEnd']; i += patSettings['kStep']) {
-    gcode += 'SET_PRESSURE_ADVANCE ADVANCE=' + Math.round10(i, PA_round) + ' EXTRUDER=' + basicSettings['extruderName'] + ' ; set Pressure Advance\n' +
+    gcode += setPressureAdvance(Math.round10(i, PA_round), basicSettings['extruderName'], basicSettings['gcodeFlavor']) +
              'M117 K' + Math.round10(i, PA_round) + ' ; \n' +
              doEfeed('+', basicSettings, (basicSettings['fwRetract'] ? 'FWR' : 'STD')) +
              createLine(startX + patSettings['lengthSlow'], startZ + j, patSettings['lengthSlow'], basicSettings, {'speed': basicSettings['slow']}) +
@@ -633,6 +647,7 @@ function setLocalStorage() {
       EXTRUDER_NAME = $('#EXTRUDER_NAME').val(),
       FAN_SPEED = parseFloat($('#FAN_SPEED').val()),
       EXT_MULT = parseFloat($('#EXTRUSION_MULT').val()),
+      GCODE_FLAVOR = $('#GCODE_FLAVOR').val(),
       PATTERN_TYPE = $('#TYPE_PATTERN').val(),
       K_START = parseFloat($('#K_START').val()),
       K_END = parseFloat($('#K_END').val()),
@@ -673,6 +688,7 @@ function setLocalStorage() {
     'EXTRUDER_NAME': EXTRUDER_NAME,
     'FAN_SPEED' : FAN_SPEED,
     'EXT_MULT': EXT_MULT,
+    'GCODE_FLAVOR': GCODE_FLAVOR,
     'PATTERN_TYPE': PATTERN_TYPE,
     'K_START': K_START,
     'K_END': K_END,
@@ -964,6 +980,7 @@ $(window).load(() => {
       $('#EXTRUDER_NAME').val(settings['EXTRUDER_NAME']);
       $('#FAN_SPEED').val(settings['FAN_SPEED']);
       $('#EXTRUSION_MULT').val(settings['EXT_MULT']);
+      $('#GCODE_FLAVOR').val(settings['GCODE_FLAVOR']);
       $('#TYPE_PATTERN').val(settings['PATTERN_TYPE']);
       $('#K_START').val(settings['K_START']);
       $('#K_END').val(settings['K_END']);
